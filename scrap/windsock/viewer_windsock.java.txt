@@ -1,0 +1,124 @@
+// Precipitation viewer - the windsock, removed from viewer/src/precip on 2026-10-10 (Phase L).
+// Everything below is the removed text, unedited, cut from the sources as they were before the removal.
+// Not compiled (.txt). How to put it back: scrap/windsock/VIEWER.md.
+// A windsock was a plain object of the hello message: kind "windsock", x, y (foot of the pole on the ground),
+// w 10, h 70 (pole height); per frame its sway (-1..1, wind / 14 m/s at the top of the pole) came with the object deltas.
+
+// ==================================================================================================
+// [1] Renderer.java, method drawWindsock (stood after drawSnowpack, before the "clouds" section; lines 1301-1329).
+//     Called from drawWorld, see [2]. Uses the Renderer's fields anim (animation clock, seconds) and lit(Color)
+//     (daylight), and Model.clamp. Drawn in world coordinates (g has the world transform).
+// ==================================================================================================
+    private void drawWindsock(Graphics2D g, Model.Obj o) {
+        double top = o.y - o.h;
+        g.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setColor(lit(new Color(180, 184, 190)));
+        g.draw(new Line2D.Double(o.x, o.y, o.x, top));
+        double s = Model.clamp(o.sway, -1, 1);
+        double droop = (1 - Math.min(1, Math.abs(s) * 1.1)) * 1.25 + Math.sin(anim * 9 + o.x) * 0.06;
+        double dir = s >= 0 ? 1 : -1;
+        double len = 38;
+        double ang = Math.atan2(Math.sin(droop), dir * Math.cos(droop));
+        AffineTransform old = g.getTransform();
+        g.translate(o.x, top + 3);
+        g.rotate(ang);
+        int seg = 5;
+        for (int k = 0; k < seg; k++) {
+            double x0 = len * k / seg, x1 = len * (k + 1) / seg;
+            double r0 = 7 - 4.0 * k / seg, r1 = 7 - 4.0 * (k + 1) / seg;
+            double wave = Math.sin(anim * 12 - k) * 1.2 * (k / (double) seg);
+            Path2D.Double q = new Path2D.Double();
+            q.moveTo(x0, -r0 + wave);
+            q.lineTo(x1, -r1 + wave);
+            q.lineTo(x1, r1 + wave);
+            q.lineTo(x0, r0 + wave);
+            q.closePath();
+            g.setColor(lit(k % 2 == 0 ? new Color(245, 110, 40) : new Color(245, 245, 245)));
+            g.fill(q);
+        }
+        g.setTransform(old);
+    }
+
+// ==================================================================================================
+// [2] Renderer.java, drawWorld: the dispatch (lines 760-778 as they were; the windsock line is 767).
+//     It sat in the loop over the live objects that also draws the trees and the moving parts of buildings,
+//     after the ponds / puddles / snowpacks and the running drops, before the tornado scars and the cars.
+// ==================================================================================================
+        for (Model.Obj o : objs) {
+            if (o.x + o.w + 140 < v.wx0 || o.x - o.w - 140 > v.wx1) continue;
+            if (o.y + 12 < bandWy0 || o.y - o.h * 2.4 - 150 > bandWy1) continue;
+            if (o.kind.equals("tree")) {
+                if (!trees) continue;
+                double wig = Math.sin(anim * (1.6 + (o.x % 5) * 0.1) + o.x) * (0.04 + Math.abs(o.sway) * 0.06);
+                BuildingPainter.paintTree(g, o, lit, -(o.sway + wig) * 0.32, 0);
+            } else if (o.kind.equals("windsock")) drawWindsock(g, o);
+            else if (o.building && BuildingPainter.hasLive(o.kind) && BuildingPainter.liveWorks(o)) {
+                if (o.layer == 1) {
+                    AffineTransform old = g.getTransform();
+                    g.translate(o.x, o.y);
+                    g.scale(0.9, 0.9);
+                    g.translate(-o.x, -o.y);
+                    BuildingPainter.paintLive(g, o, lit, anim, 0.36);
+                    g.setTransform(old);
+                } else BuildingPainter.paintLive(g, o, lit, anim, 0);
+            }
+        }
+
+// ==================================================================================================
+// [3] Renderer.java, the section heading above drawPond (line 1206). It is now "water, snow".
+// ==================================================================================================
+    // ------------------------------------------------------------------------------ water, snow, windsock
+
+// ==================================================================================================
+// [4] ViewerState.java, applyFrame (lines 328-329): the kinds whose state changes do not re-bake the scenery tiles
+//     (they are drawn live every frame). The windsock was one of them.
+// ==================================================================================================
+                boolean live = n.kind.equals("tree") || n.kind.equals("windsock") || n.kind.equals("pond")
+                        || n.kind.equals("puddle") || n.kind.equals("snowpack");
+
+// ==================================================================================================
+// [5] FakeSim.java (the viewer's built-in stand-in for the Python sim), world generation:
+//     the comment at line 674 and the two windsocks at line 719 (after the snowpacks; they were the last objects
+//     made, so removing them changed no other object's id, and they drew nothing from the Random).
+// ==================================================================================================
+        // ---- trees (four variants), ponds, puddles, snowpacks, windsocks
+        for (double px : new double[]{W * 0.381, W * 0.92}) objs.add(new FObj(id++, "windsock", "", px, groundAt(px), 10, 70));
+
+// ==================================================================================================
+// [6] FakeSim.java, tick(): the object update (lines 1117-1123 and 1132-1138). The windsock swayed with the wind
+//     at the top of its pole and took neither snow nor wetness.
+// ==================================================================================================
+            switch (o.kind) {
+                case "tree", "windsock", "windmill", "factory" -> {
+                    double[] w = windAt(o.x, o.y - o.h);
+                    o.sway = Model.clamp(w[0] / 14 + Math.sin(t * 1.7 + o.x * 0.01) * 0.05, -1, 1);
+                }
+                default -> { }
+            }
+            // ...
+            switch (o.kind) {
+                case "mountain", "hill", "windsock" -> { }
+                case "puddle" -> { o.wet = gWet[gi]; o.w = 6 + gWet[gi] * 70; o.h = 2 + gWet[gi] * 5; }
+                case "snowpack" -> { o.snow = gSnow[gi]; o.w = 40 + gSnow[gi] * 200; o.h = 3 + gSnow[gi] * 16; }
+                case "pond" -> { o.wet = gWet[gi]; o.snow = surfaceTemp < -1 ? 1 : 0; }
+                default -> { o.snow = gSnow[gi]; o.wet = gWet[gi]; }
+            }
+
+// ==================================================================================================
+// [7] DebugWorlds.java, WeatherTab (the Debug mode's Weather tab, view "Ground water"):
+//     the list of things to look at (line 445), the camera zoom and the note (lines 590-593), the selector (line 757).
+// ==================================================================================================
+        static final String[] WATER = {"pond", "puddle", "snowpack", "windsock"};
+            // ...
+                        double z = kind.equals("pond") ? 2.0 : kind.equals("windsock") ? 2.4 : 2.8;
+                        p.cam.set(pick.x, pick.y - p.cam.vh / z * 0.28, z, true);
+                    };
+                    note = "Ponds ripple in the rain and freeze below −1 °C, puddles grow with the wet ground, snowpacks with the snow on it, windsocks follow the wind.";
+            // ...
+                ui.seg(new String[]{"Pond", "Puddle", "Snowpack", "Windsock"}, water, x, y, w, 30, k -> water = k);
+
+// ==================================================================================================
+// [8] DebugTest.java, the weather checks (lines 705-706): the water scene was required to hold a windsock.
+// ==================================================================================================
+        check(merged && storm && objs.containsAll(Arrays.asList("pond", "puddle", "snowpack", "windsock")) && diff(windOn, windOff, main, 4) > 5000 && ds.lastError == null,
+                "the merge scene reaches a merged cloud, the supercell scene a tornado, the water scene has pond / puddle / snowpack / windsock, and the wind overlays change the picture");

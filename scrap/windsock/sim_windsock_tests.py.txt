@@ -1,0 +1,106 @@
+# Windsock tests: every test (and every expectation inside a test) that was removed or changed with the windsock,
+# copied verbatim from the test files as they were on 2026-10-10 before the change. A .txt so nothing collects it.
+# Restore them into the file named in each header; SIM.md says which hashes must be taken again.
+
+# ==============================================================================================================
+# TestGroundSpots docstring (it named windsocks)
+# From: sim/tests/test_objects.py -- class TestGroundSpots -- lines 270-273 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+class TestGroundSpots(unittest.TestCase):
+    """Puddles, snowpacks and windsocks used to be put on "the flattest of 5 draws", and the flattest ground of a
+    world is the levelled pad under a settlement: 213 of 240 windsocks stood on a building, the puddles and
+    snowpacks in the streets (testing pass 2026-10-09). They now keep clear of what is built."""
+
+
+# ==============================================================================================================
+# test_no_windsock_stands_on_a_building_a_street_or_a_pond (removed whole; needs `worlds`, `_spans` and `_overlaps` of the same file)
+# From: sim/tests/test_objects.py -- class TestGroundSpots -- lines 287-302 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+    def test_no_windsock_stands_on_a_building_a_street_or_a_pond(self):
+        n_worlds = n_socks = 0
+        for label, st, objs in self.worlds():
+            n_worlds += 1
+            built = _spans(objs, BUILDING_KINDS)
+            ponds = _spans(objs, ("pond",))
+            streets = [(s["x0"], s["x1"]) for s in st]
+            socks = [o for o in objs if o["kind"] == "windsock"]
+            self.assertGreaterEqual(len(socks), 1, label)
+            for o in socks:
+                n_socks += 1
+                self.assertFalse(_overlaps(o, built, 8.0), f"windsock on a building {label} x={o['x']}")
+                self.assertFalse(_overlaps(o, ponds), f"windsock in a pond {label} x={o['x']}")
+                self.assertFalse(_overlaps(o, streets), f"windsock in a street {label} x={o['x']}")
+        self.assertGreaterEqual(n_worlds, 60)
+        self.assertGreaterEqual(n_socks, 64)
+
+
+# ==============================================================================================================
+# test_quiet_frames_list_no_rain_objects: the line that allowed windsock rows (was `("tree", "windsock")`)
+# From: sim/tests/test_objects.py -- class TestDeltas -- lines 57-57 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+                self.assertIn(kinds[row[0]], ("tree", "windsock"), "only wind-driven sway in a dry world")
+
+
+# ==============================================================================================================
+# test_rain_frame_lists_only_exposed_objects: the set that allowed windsock rows
+# From: sim/tests/test_objects.py -- class TestDeltas -- lines 72-73 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+            self.assertIn(kinds[r[0]], set(BUILDING_KINDS) | {"tree", "puddle", "windsock"},
+                          "rain only touches things under it")
+
+
+# ==============================================================================================================
+# test_the_spots_are_on_flat_ground_and_every_world_still_has_them: the kinds loop (windsock needed 1 per world)
+# From: sim/tests/test_objects.py -- class TestGroundSpots -- lines 324-324 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+            for kind, least in (("puddle", 3), ("snowpack", 3), ("windsock", 1)):
+
+
+# ==============================================================================================================
+# test_preset_worlds_keep_their_spots_clear_too: the windsock was checked against buildings, ponds and streets
+# From: sim/tests/test_objects.py -- class TestGroundSpots -- lines 355-360 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+                if o["kind"] in ("puddle", "snowpack", "windsock"):
+                    self.assertFalse(_overlaps(o, built), (pid, o["kind"], o["x"]))
+                    self.assertFalse(_overlaps(o, ponds), (pid, o["kind"], o["x"]))
+                if o["kind"] in ("snowpack", "windsock"):
+                    self.assertFalse(_overlaps(o, streets), (pid, o["kind"], o["x"]))
+
+
+
+# ==============================================================================================================
+# test_a_world_with_no_clear_room_has_fewer_spots_and_the_same_stream_and_world: the spots tuple
+# From: sim/tests/test_objects.py -- class TestGroundSpots -- lines 372-372 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+        spots = ("puddle", "snowpack", "windsock")
+
+
+# ==============================================================================================================
+# PLAIN_WORLD_HASHES (full-world hashes WITH the windsocks: put these back, and drop the `windsock` filter, when they return)
+# From: sim/tests/test_presets.py -- module constant -- lines 697-708 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+# sha256 of json(terrain.y, settlements, objects) of generate_world() for plain (non-preset) worlds, recorded
+# BEFORE the biome work: a world without a preset must come out byte for byte as it did.
+PLAIN_WORLD_HASHES = {
+    (1, 3840, 1080, "rolling", "normal"): "a5b4e71cceacbb67826ca0bbfc8391d3f63f8149463ba8ef9470b4eb3303827b",
+    (2, 3840, 1080, "hilly", "dense"): "ab4b96c7094d3c98535fc3893b6d1f989bab3922c183bd1a97377ed347886755",
+    (3, 1920, 1080, "mountainous", "sparse"): "341420a4d718ed26cafe75b24e1253e8941bcf7f4c240de9ecdd697bb673493e",
+    (4, 6400, 1200, "flat", "normal"): "10ad741335d7a327e94c99cb395641f43dc8f097f9cc0f9f689180081f767937",
+    (5, 2560, 1080, "rolling", "none"): "f02173d4df1680ed35fb571a66bb63392001dd4812dac1881c4a29c93cefdd11",
+    (7, 3840, 1080, "hilly", "normal"): "c6cc3b0c66d02d2dfc2b18d7b19405558f792c34d5e4e0d28223ced23279fe5b",
+    (11, 1280, 720, "rolling", "normal"): "b1f54f0dc7dbed29b23a05b540cc697c5b361e8150df2c4c7dce5e593a49e51f",
+    (12, 3840, 1080, "mountainous", "dense"): "324b55ade382c8e515893b1cc4dae1dc755b0b38db22b529d0c95db569dbdefa",
+}
+
+
+# ==============================================================================================================
+# test_plain_worlds_keep_terrain_settlements_and_buildings_when_the_ground_spots_moved: docstring and spots tuple
+# From: sim/tests/test_presets.py -- class TestPresetBiomes -- lines 980-984 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+        """The 2026-10-09 fix moved puddles, snowpacks and windsocks only: the hash of terrain + settlements + every
+        other object (trees, ponds, buildings, mountains, hills; same ids) is what it was before the fix."""
+        import hashlib
+        from objects import generate_world
+        spots = ("puddle", "snowpack", "windsock")
+
+

@@ -1,0 +1,36 @@
+# Java viewer build output (build.bat / build.sh write viewer/out; the rest are ad-hoc builds)
+viewer/out/
+viewer/out_*/
+*.class
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated captures and scratch output
+viewer/snapshots/
+screenshots/
+tools/.cache/
+tools/debug_plots/
+Testing/_tmp/
+Testing/logs/
+
+# Player data
+saves/
+
+# Local tooling state
+.claude/settings.local.json
+.sa-asker/
+.stacker/
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.bak
+*.log

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "background": {"file":"","fit":1,"dim":0.2,"tint":true},
+  "graphics": {"cloudQuality":0,"renderScale":0,"fullscreen":false,"showFps":true,"underCloudDim":true,"underCloudDimStrength":0.65,"epilepsySafe":false,"advanced":{"maxParticles":25,"renderScale":0,"lightningDetailOff":false,"globalLightning":false,"branchingOff":false,"cullHidden":true,"simpleClouds":false,"noTint":false,"noFlash":false,"noSnow":false,"noTrails":false,"noShine":true,"noPuddleImpact":false,"glintStar":true}},
+  "game": {"autosaveMinutes":2,"defaultSize":3,"defaultTerrain":"rolling","defaultSettlements":"normal"},
+  "panels": {"left":false,"right":false,"minimap":false,"climate":true},
+  "window": {"x":70,"y":-11,"w":1680,"h":760,"maximized":true},
+  "lastSlot": "simulation-1-tms5j7",
+  "modes": {"hurricaneChapter":0,"hurricaneExplore":true,"hurricaneStage":"landfall","hurricaneView":"both","showcaseType":"supercell","debugUnlocked":true},
+  "keys": {"PAUSE":[32],"SPEED_UP":[61,521,107],"SPEED_DOWN":[45,109],"PAN_LEFT":[37],"PAN_RIGHT":[39],"PAN_UP":[38],"PAN_DOWN":[40],"ZOOM_IN":[33],"ZOOM_OUT":[34],"FIT_WORLD":[36],"HOME_VIEW":[35],"WIND_LEFT":[81],"WIND_RIGHT":[69],"COLDER":[90],"WARMER":[88],"RESEED":[82],"HUMIDITY_DOWN":[49],"HUMIDITY_UP":[50],"CO2_DOWN":[51],"CO2_UP":[52],"AEROSOL_DOWN":[53],"AEROSOL_UP":[54],"SEASON_PREV":[55],"SEASON_NEXT":[56],"HOUR_BACK":[57],"HOUR_FORWARD":[48],"SPAWN_TYPE":[67],"TORNADO":[84],"TOGGLE_CLIMATE":[75],"TOGGLE_DRAINS":[68],"DRAIN_SMALLER":[44],"DRAIN_LARGER":[46],"TOGGLE_WIND":[87],"TOGGLE_ARROWS":[65],"TOGGLE_LABELS":[76],"TOGGLE_LEGEND":[71],"TOGGLE_HELP":[72,112],"TOGGLE_MINIMAP":[77],"TOGGLE_LEFT_PANEL":[91],"TOGGLE_RIGHT_PANEL":[93],"TOGGLE_ALL_PANELS":[92],"MENU":[27],"QUICK_SAVE":[116],"FULLSCREEN":[122],"SCREENSHOT":[123]}
+}

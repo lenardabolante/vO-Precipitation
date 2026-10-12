@@ -1,0 +1,140 @@
+{
+  "rain_heavy": {
+    "file": "rain_heavy.wav",
+    "group": "rain",
+    "seconds": 120.0,
+    "loop": true,
+    "gain": 0.2818
+  },
+  "rain_light": {
+    "file": "rain_light.wav",
+    "group": "rain",
+    "seconds": 93.161,
+    "loop": true,
+    "gain": 0.3846
+  },
+  "thunder_1": {
+    "file": "thunder_1.wav",
+    "group": "thunder",
+    "seconds": 5.101,
+    "loop": false,
+    "gain": 1.1142
+  },
+  "thunder_2": {
+    "file": "thunder_2.wav",
+    "group": "thunder",
+    "seconds": 7.983,
+    "loop": false,
+    "gain": 0.751
+  },
+  "thunder_3": {
+    "file": "thunder_3.wav",
+    "group": "thunder",
+    "seconds": 9.367,
+    "loop": false,
+    "gain": 0.7962
+  },
+  "thunder_4": {
+    "file": "thunder_4.wav",
+    "group": "thunder",
+    "seconds": 15.604,
+    "loop": false,
+    "gain": 0.8632
+  },
+  "thunder_5": {
+    "file": "thunder_5.wav",
+    "group": "thunder",
+    "seconds": 11.071,
+    "loop": false,
+    "gain": 0.8103
+  },
+  "thunder_6": {
+    "file": "thunder_6.wav",
+    "group": "thunder",
+    "seconds": 11.023,
+    "loop": false,
+    "gain": 1.1737
+  },
+  "thunder_7": {
+    "file": "thunder_7.wav",
+    "group": "thunder",
+    "seconds": 6.492,
+    "loop": false,
+    "gain": 0.7499
+  },
+  "car_1": {
+    "file": "car_1.wav",
+    "group": "traffic",
+    "seconds": 3.347,
+    "loop": false,
+    "gain": 0.7499,
+    "peak": 1.365
+  },
+  "car_2": {
+    "file": "car_2.wav",
+    "group": "traffic",
+    "seconds": 6.239,
+    "loop": false,
+    "gain": 0.8384,
+    "peak": 3.305
+  },
+  "car_3": {
+    "file": "car_3.wav",
+    "group": "traffic",
+    "seconds": 5.769,
+    "loop": false,
+    "gain": 0.7499,
+    "peak": 1.375
+  },
+  "car_4": {
+    "file": "car_4.wav",
+    "group": "traffic",
+    "seconds": 26.402,
+    "loop": false,
+    "gain": 2.0347,
+    "peak": 12.615
+  },
+  "car_5": {
+    "file": "car_5.wav",
+    "group": "traffic",
+    "seconds": 8.728,
+    "loop": false,
+    "gain": 1.4225,
+    "peak": 4.385
+  },
+  "city_a": {
+    "file": "city_a.wav",
+    "group": "towns",
+    "seconds": 45.202,
+    "loop": true,
+    "gain": 1.1749
+  },
+  "city_b": {
+    "file": "city_b.wav",
+    "group": "towns",
+    "seconds": 137.429,
+    "loop": true,
+    "gain": 6.0256
+  },
+  "siren": {
+    "file": "siren.wav",
+    "group": "storm",
+    "seconds": 7.463,
+    "loop": true,
+    "gain": 0.3126
+  },
+  "tornado": {
+    "file": "tornado.wav",
+    "group": "storm",
+    "seconds": 47.436,
+    "loop": true,
+    "gain": 0.1758
+  },
+  "hurricane": {
+    "file": "hurricane.wav",
+    "group": "storm",
+    "seconds": 45.989,
+    "loop": true,
+    "gain": 0.2951
+  }
+}

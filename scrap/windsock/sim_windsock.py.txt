@@ -1,0 +1,106 @@
+# Windsock: everything the sim had of it, copied verbatim (not edited) from the sources as they were on 2026-10-10 before
+# it was removed. This is a .txt on purpose: nothing imports it. See SIM.md in this folder for how to put it back.
+#
+# The pieces are in the order they appear in sim/objects.py. Each one says which file and which function or constant it
+# came from. The line numbers are those of the old file, not of the file today.
+#
+# Things the windsock used that are NOT in here because they did not change (trees still use them): ObjectField.update's wind lean
+# loop (sway_idx), ObjectField.apply_tornadoes' storm sway (`if o["kind"] in SWAYERS`), ObjectField.settle_sway, the `sway` field
+# of _obj and of the object rows `[id, sway, snow, wet, w, h]`. They work for any kind that is in SWAYERS.
+
+# ==============================================================================================================
+# SCENERY_KINDS (the tuple with the windsock last)
+# From: sim/objects.py -- module constant -- lines 20-20 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+SCENERY_KINDS = ("mountain", "hill", "tree", "pond", "puddle", "snowpack", "windsock")
+
+
+# ==============================================================================================================
+# SWAYERS (trees and windsocks lean in the wind)
+# From: sim/objects.py -- module constant -- lines 23-23 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+SWAYERS = frozenset(("tree", "windsock"))
+
+
+# ==============================================================================================================
+# DAMAGE_VT (tornado damage threshold, 24 m/s: the weakest thing in the game)
+# From: sim/objects.py -- module constant -- lines 29-31 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+DAMAGE_VT = {"tree": 34.0, "windsock": 24.0, "house": 33.0, "barn": 30.0, "church": 42.0, "windmill": 36.0,
+             "shop": 40.0, "apartment": 60.0, "office": 68.0, "skyscraper": 82.0, "factory": 48.0,
+             "water_tower": 44.0, "streetlamp": 32.0}
+
+
+# ==============================================================================================================
+# SPOT_MARGIN and its comment (the windsock kept 12 px clear)
+# From: sim/objects.py -- module constants -- lines 48-49 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+# -- where the ground-level spots (puddle, snowpack, windsock) may stand -------------------------------------
+SPOT_MARGIN = {"puddle": 4.0, "snowpack": 4.0, "windsock": 12.0}   # px kept clear beyond the object's half width
+
+
+# ==============================================================================================================
+# avoid_sets (a windsock avoided buildings, ponds and streets, NOT puddles or snowpacks)
+# From: sim/objects.py -- generate_world, the 'dynamic spots' block -- lines 321-330 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+    # Where a puddle, a snowpack or a windsock may stand. The flattest ground of a world is the levelled pad
+    # under a settlement, so picking "the flattest of 5 draws" alone put them inside buildings and in the
+    # street; a spot now has to be clear of the things in `avoid` (the same draws are made as before, so the
+    # rest of the seeded stream, and everything generated after it, is unchanged; nothing here draws more).
+    foot = _merge([(o["x"] - o["w"] / 2.0, o["x"] + o["w"] / 2.0) for o in objects
+                   if o["kind"] in BUILDING_KINDS])
+    pond_spans = _merge([(o["x"] - o["w"] / 2.0, o["x"] + o["w"] / 2.0) for o in objects if o["kind"] == "pond"])
+    street_spans = _merge([(s["x0"], s["x1"]) for s in settlements])
+    avoid_sets = {"puddle": (foot, pond_spans), "snowpack": (foot, pond_spans, street_spans),
+                  "windsock": (foot, pond_spans, street_spans)}
+
+
+# ==============================================================================================================
+# flat_spot (the one line that is windsock-only is `half = 0.5 * (20.0 if kind != "windsock" else 8.0) + SPOT_MARGIN[kind]`)
+# From: sim/objects.py -- generate_world, nested function -- lines 332-356 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+    def flat_spot(kind, tries=5):
+        """x of a flat spot for `kind`, or None when the world has no clear room for it. The flattest of `tries`
+        draws that is clear of `avoid_sets[kind]` (and no steeper than FLAT_SLOPE, unless every draw is); if
+        there is none, the nearest clear x with level ground to the flattest draw, found by a scan, not by
+        drawing again; failing that the flattest clear x there is."""
+        spans = avoid_sets[kind]
+        half = 0.5 * (20.0 if kind != "windsock" else 8.0) + SPOT_MARGIN[kind]
+        draws = []
+        for _ in range(tries):
+            x = rng.uniform(20.0, w - 20.0)
+            draws.append((abs(terrain.slope_at(x)), x))
+        sl0, x0 = min(draws, key=lambda d: d[0])        # (the old pick: the flattest draw, the first of equals)
+        ok = max(FLAT_SLOPE, sl0)
+        best = None
+        for sl, x in draws:
+            if sl <= ok and (best is None or sl < best[0]) and _clear(spans, x, half):
+                best = (sl, x)
+        if best is not None:
+            return best[1]
+        xs = [x0 + sgn * 4.0 * j for j in range(int((w - 40.0) / 4.0) + 1) for sgn in (1.0, -1.0)]
+        xs = [x for x in xs if 20.0 <= x <= w - 20.0 and _clear(spans, x, half)]
+        pool = ([x for x in xs if abs(terrain.slope_at(x)) <= 0.01] or      # dead level first, then merely flat
+                [x for x in xs if abs(terrain.slope_at(x)) <= FLAT_SLOPE] or
+                sorted(xs, key=lambda x: abs(terrain.slope_at(x)))[:1])
+        return pool[0] if pool else None        # (xs is ordered by distance from x0; the first flat one is the nearest)
+
+
+# ==============================================================================================================
+# the placement loop: the LAST consumer of `rng` in generate_world; its draws are still made today, see SIM.md
+# From: sim/objects.py -- generate_world, end of the function -- lines 379-383 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+    for _ in range(max(1, int(round(0.7 * u)))):
+        x = flat_spot("windsock")
+        seed_ = rng.getrandbits(31)
+        if x is not None:
+            objects.append(_obj("windsock", x, terrain.height_at(x), 8.0, 40.0, seed_))
+
+
+# ==============================================================================================================
+# SCENERY_KINDS of the test schema (the protocol validator)
+# From: sim/tests/_schema.py -- module constant -- lines 13-13 of the file as it was before the windsock was removed.
+# ==============================================================================================================
+SCENERY_KINDS = {"mountain", "hill", "tree", "pond", "puddle", "snowpack", "windsock"}
+
+
